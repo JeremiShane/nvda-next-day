@@ -1,0 +1,14 @@
+# Direct dependencies of pipeline/ (pinned to the environment that ran the study).
+# Python 3.11 or newer. Transitive packages are installed with these.
+numpy==2.5.4
+pandas==3.1.0
+pyarrow==26.0.0
+requests==2.34.2
+yfinance==1.7.0
+pandas_market_calendars==5.5.0
+scipy==1.18.1
+scikit-learn==1.9.1
+statsmodels==0.15.0
+lightgbm==4.7.0
+shap==0.54.1
+xlsxwriter==3.3.0
