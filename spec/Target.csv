@@ -1,0 +1,11 @@
+Item,Name,Definition,Data / Notes,Rationale
+Primary label,y_up_next,1 if close_{t+1} > close_t else 0 (ties -> 0),Split-adjusted NVDA close (src 1). Equal closes are rare; treat as 0 and document.,Primary target per brief.
+Alt: next-day log return,y_ret_next,ln(close_{t+1} / close_t),Same prices; regression target; label can be derived as sign.,Enables magnitude-aware models and probability calibration checks.
+Alt: thresholded label,y_up_thresh,"1 if ln(close_{t+1}/close_t) > +k*sigma_t, 0 if < -k*sigma_t, else drop/neutral (sigma_t = nvda_rvol_20d/sqrt(252))",Choose k by validation only (not on test).,Reduces label noise from tiny moves.
+Alt: excess vs market,y_up_vs_qqq,1 if NVDA next-day log return > QQQ next-day log return,QQQ close_{t+1}.,Isolates idiosyncratic signal.
+Alt: excess vs sector,y_up_vs_smh,1 if NVDA next-day log return > SMH next-day log return,SMH close_{t+1}.,Isolates stock-specific vs semiconductor move.
+Alt: next-day open-to-close,y_up_oc_next,1 if close_{t+1} > open_{t+1},Excludes overnight gap.,Tests intraday predictability separately from gap.
+Alt: overnight gap,y_gap_up_next,1 if open_{t+1} > close_t,Captures post-6 p.m. and pre-market news.,Note: information between 6 p.m. and next open is unknown at t.
+Alt: 3-class,y_3class,up / flat / down using +/- k*sigma_t bands,As above.,Allows abstaining on low-conviction days.
+Alignment,n/a,Features dated t (as of 18:00 ET) map to label using t+1 = next trading session per trading calendar (src 25); skip weekends/holidays.,Last row in sample has no label; drop it.,Never use data timestamped after 18:00 ET on t.
+Class balance,n/a,"Report base rate of y_up_next per training window; evaluate with log-loss, Brier, AUC, and accuracy vs base rate.",n/a,Up-day share is typically somewhat above 50% for a trending stock; compare against majority-class baseline.

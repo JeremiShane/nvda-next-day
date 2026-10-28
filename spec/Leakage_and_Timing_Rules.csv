@@ -1,0 +1,25 @@
+Rule ID,Rule,Details,Applies to (Source #)
+R01,Information cutoff,Every feature for date t may use only information timestamped <= 18:00 ET on trading day t.,All
+R02,Point-in-time storage,Snapshot raw downloads daily with a retrieval timestamp; build history from snapshots or vintage-aware APIs (ALFRED realtime_start/realtime_end) rather than today's revised data.,"All, esp. 8, 15-21"
+R03,Release lags,"FRED daily series: lag 1 business day by default. DTWEXBGS: weekly release, lag up to ~1 week. Monthly macro: usable only from release date (8:30 a.m. ET) onward, then forward-fill.","8, 15-17, 19-21"
+R04,Revisions,"Use first-release (or as-of-t vintage) values for payrolls, PCE, seasonally adjusted CPI. Never use final revised history in backtests.",19-21
+R05,Split adjustment,Adjust prices and volumes for splits using only split events with ex-date <= t when reconstructing history; dollar volume and returns are split-invariant. Verify adjustment factors after each split.,1-7
+R06,Dividend adjustment,Use total-return (dividend-adjusted) closes for ETFs with distributions; adjustment for a dividend applies from its ex-date.,"6, 7"
+R07,Holidays & calendars,"Align all series on the equity trading calendar (src 25). Forward-fill non-equity series (bond-market holidays, weekends for crypto) with a staleness counter; never back-fill.",All
+R08,Timestamp the target,Label uses close_{t+1} of the next trading session; drop final row; features never include any t+1 field.,Target
+R09,Cboe timing,"Use official end-of-day values. Verify put/call statistics are posted before 18:00 ET historically; if not, lag 1 day.",10-13
+R10,Treasury timing,Par yield curve posting is close to the 18:00 cutoff; default to t-1 values unless posting time is verified.,14
+R11,Crypto snapshot,Sample BTC/ETH at exactly 18:00 ET from hourly/minute candles; do not use UTC daily candles (close after cutoff). Handle DST shifts.,18
+R12,EDGAR acceptance time,"Use acceptanceDateTime (ET), not filingDate. Window for day t = (18:00 ET t-1, 18:00 ET t].",24
+R13,Future events,"Only scheduled events known at t (FOMC, BLS, holidays, OPEX) may be forward-looking. Earnings dates must be estimated or taken from announcements made before t.",22-25
+R14,Rolling statistics,"All z-scores, betas, SMAs, scalers use trailing windows ending at t; discard warm-up rows; fit any normalization inside each training fold only.",All
+R15,Survivorship / listing,Use only instruments trading at t (e.g. ARM after IPO). Handle tickers renamed (e.g. META formerly FB) by mapping history correctly.,"4, 5"
+R16,Missing data,Represent missing as NaN plus a missing-indicator; never fill with future values or full-sample means.,All
+R17,Early closes,Flag early-close days; their volume/range features are not comparable to full sessions.,"1-7, 25"
+R18,Vol-scaled moves,z-scaled moves divide today's change by the stdev of that change over the trailing 60 observations ending t-1 (exclude today). Require a minimum number of valid observations; NaN otherwise.,All *_z60 features
+R19,Days-to counters,"'Days to' features may use only dates known in advance at t (published schedules, announced dates). Unknown/unscheduled events (intermeeting FOMC, unannounced earnings) must never appear before they are announced; use estimates explicitly flagged as estimates.","22-25, optional sources"
+R20,Derived dates,"Derived dates (e.g. FOMC minutes = decision + 21 calendar days, estimated NVDA earnings) are flagged 'derived'; replace with the official date only from the time it was published.","23, 24"
+R21,Days-since counters,"Count in trading days, cap at a fixed maximum, and set NaN during burn-in before the first event is observed (do not assume an event happened just before the sample).",All days_since_* features
+R22,Thresholds,"Fixed thresholds (5% move, VIX 30, Form 4 cluster size) are set a priori or chosen inside training folds only; percentile thresholds use trailing windows.","1, 10, 24"
+R23,Change features & lags,"For lagged series (FRED, Treasury default), changes are computed on the lagged values (e.g. t-1 vs t-2), not mixing a same-day value with a lagged one.",14-17
+R24,Proposed sources,"Sources marked 'proposed / not in inventory' (BEA schedule, peer/hyperscaler earnings, NVIDIA events, index rebalances) need their own point-in-time archive before use.",Optional features

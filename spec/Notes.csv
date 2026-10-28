@@ -1,0 +1,15 @@
+Topic,Guidance
+Feature count,255 features in the Features tab across 32 categories; every inventory row (1-25) is referenced; one category holds optional features that need sources outside the inventory (see Data Sources rows 26-29).
+Stationarity,"Use log returns, differences, ratios, and distances from moving averages instead of raw price/yield levels; levels (VIX, yields, OAS) should be z-scored or differenced. Test with ADF/KPSS on training data only."
+Rolling z-scoring,"Standardize each feature with trailing windows (e.g. 60 or 252 days) ending at t, or fit scalers inside each walk-forward training fold. Winsorize extreme values (e.g. at 1st/99th pct of training fold)."
+Encoding,One-hot day_of_week; sin/cos for month; binary flags as 0/1; cap 'days to/since' counters.
+Missing data,"Forward-fill lagged/low-frequency series with a staleness feature; keep missing indicators for short-history instruments (ARM, some vol indices)."
+Redundancy,"Many features are correlated (e.g. SMH vs SOXX, Treasury vs FRED yields). Check correlation clusters / VIF; use regularization or feature selection inside folds."
+Validation,Walk-forward (expanding or rolling) validation with an embargo/gap of at least 1 day between train and test; never shuffle. Tune hyperparameters only on inner folds.
+Baselines,"Compare with majority-class baseline, previous-day direction, and a logistic regression on a few High-priority features."
+Metrics,"Log-loss, Brier score, ROC-AUC, accuracy vs base rate; track calibration and performance by regime (earnings days, FOMC days, high-VIX)."
+Event handling,"Earnings days (earnings_8k_today = 1) behave very differently; consider excluding them, modeling separately, or adding interaction terms."
+Scope,"This is a feature specification only; no market data has been downloaded or included. Verify source URLs, posting times, and history start dates during implementation."
+Change & direction features,"Level, change, z-scaled change, sign and absolute value of the same series are deliberately included; they are highly collinear, so use regularization, tree models, or select within folds. The sign/abs split lets models treat direction and magnitude separately."
+Proximity features,"Capped trading-day counters can be used raw, as 1/(1+d), or bucketed (0, 1, 2-5, 6+). Combine with next-day flags rather than replacing them."
+Version history,v2: added 62 change/direction features and 41 proximity-to-event features (incl. 6 optional features needing sources outside the inventory); Feature IDs renumbered sequentially.
