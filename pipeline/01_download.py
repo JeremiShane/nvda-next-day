@@ -3,7 +3,11 @@ import os, io, json, time, datetime as dt, re
 import pandas as pd, numpy as np, requests, yfinance as yf
 from paths import RAW_DIR
 RAW=str(RAW_DIR); os.makedirs(RAW,exist_ok=True)
-UA={'User-Agent':'NVDA feature research (personal study) research@example.com'}
+_CONTACT=os.environ.get('NVDA_USER_AGENT_EMAIL','').strip()
+if not _CONTACT:
+    _CONTACT='contact-not-set@example.invalid'
+    print('Set NVDA_USER_AGENT_EMAIL to your own contact email before downloading. SEC EDGAR requires that contact in the User-Agent; the fallback is not a real address and does not meet the policy.')
+UA={'User-Agent':f'NVDA feature research (personal study) {_CONTACT}'}
 START='2022-01-01'; END='2026-10-23'   # warm-up from 2022; modeling from 2024-01-02
 log=[]
 def note(src,**k): k['source']=src; k['retrieved']=dt.datetime.now().isoformat(timespec='seconds'); log.append(k); print(k)
@@ -107,6 +111,6 @@ for name,url in [('fomc_calendar','https://www.federalreserve.gov/monetarypolicy
                  ('bea_schedule','https://www.bea.gov/news/schedule')]:
     p=f'{RAW}/{name}.html'
     if not os.path.exists(p):
-        r=requests.get(url,headers={'User-Agent':'Mozilla/5.0 (research script; research@example.com)'},timeout=60); open(p,'w').write(r.text)
+        r=requests.get(url,headers={'User-Agent':f'Mozilla/5.0 (research script; {_CONTACT})'},timeout=60); open(p,'w').write(r.text)
         note('html',name=name,status=r.status_code,bytes=len(r.text))
 json.dump(log,open(f'{RAW}/download_log.json','a'),indent=1)
